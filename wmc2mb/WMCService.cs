@@ -617,7 +617,6 @@ namespace wmc2mb
                     mediaInfo = GetMediaSource(transcodeProfileId);                             // get mediainfo using the profile name
                     mediaInfo.Id = streamId;
                     mediaInfo.Path = strm;
-                    mediaInfo.IgnoreDts = true;
                 }
                 else                                                                            // for ALL other cases, see if swmc sent us a/v stream info
                 {
@@ -652,7 +651,6 @@ namespace wmc2mb
                         DefaultAudioStreamIndex = (mainAudio != null) ? (int?)mainAudio.Index : null,
                         RequiresOpening = true,
                         RequiresClosing = true,
-                        IgnoreDts = true,
                         Bitrate = (vidStream != null) ? (int?)((double)vidStream.BitRate * 1.1) : null,  // don't know if this is useful
                     };
                 }
@@ -661,14 +659,12 @@ namespace wmc2mb
                 if (isUrl)
                 {
                     mediaInfo.Protocol = MediaBrowser.Model.MediaInfo.MediaProtocol.Http;
-                    mediaInfo.ReadAtNativeFramerate = false;            // false for urls
                     if (!isDlna)                                        // don't set container type for dlna addresses
                         mediaInfo.Container = "ts"; 
                 }
                 else 
                 {
                     mediaInfo.Protocol = MediaBrowser.Model.MediaInfo.MediaProtocol.File;
-                    mediaInfo.ReadAtNativeFramerate = true;             // true for files
                     mediaInfo.Container = isTS ? "ts" : "wtv";
                 }
 
@@ -1201,7 +1197,6 @@ namespace wmc2mb
                     RequiresOpening = true,
                     RequiresClosing = true,
                     MediaStreams = mstreams,
-                    IgnoreDts = true
                     //DefaultAudioStreamIndex = (mainAudio != null) ? (int?)mainAudio.Index : null,       // these are now obsoleted since swmc doesn't return stream info
                     //Bitrate = (vidStream != null) ? (int?)((double)vidStream.BitRate * 1.1) : null,     // these are now obsoleted since swmc doesn't return stream info
                 };
@@ -1209,16 +1204,12 @@ namespace wmc2mb
                 if (isUrl)
                 {
                     mediaInfo.Protocol = MediaBrowser.Model.MediaInfo.MediaProtocol.Http;
-                    mediaInfo.ReadAtNativeFramerate = false;  
                     mediaInfo.Container = "ts";     // urls are always ts (should be okay even if using dlna too)
-                    mediaInfo.IgnoreDts = true;
                 }
                 else
                 {
                     mediaInfo.Protocol = MediaBrowser.Model.MediaInfo.MediaProtocol.File;
-                    mediaInfo.ReadAtNativeFramerate = true;
                     mediaInfo.Container = isTS ? "ts" : "wtv";
-                    mediaInfo.IgnoreDts = true;
                 }
 
                 return mediaInfo;
