@@ -18,13 +18,41 @@ using MediaBrowser.Model.LiveTv;
 
 namespace wmc2mb
 {
-    public class RecordingsChannel : IChannel, IHasCacheKey, ISupportsDelete, ISupportsLatestMedia, ISupportsMediaProbe, IHasFolderAttributes, IRequiresMediaInfoCallback
+    public class RecordingsChannel : IChannel, IHasCacheKey, ISupportsDelete, ISupportsLatestMedia, ISupportsMediaProbe, IHasFolderAttributes, IRequiresMediaInfoCallback, IHasChangeEvent
     {
         public ILiveTvManager _liveTvManager;
+
+        public event EventHandler ContentChanged;
+        private Timer _updateTimer;
+
+        public void OnContentChanged()
+        {
+            if (ContentChanged != null)
+            {
+                ContentChanged(this, EventArgs.Empty);
+            }
+        }
+
+        private void OnUpdateTimerCallback(object state)
+        {
+            OnContentChanged();
+        }
 
         public RecordingsChannel(ILiveTvManager liveTvManager)
         {
             _liveTvManager = liveTvManager;
+
+            var interval = TimeSpan.FromMinutes(15);
+            _updateTimer = new Timer(OnUpdateTimerCallback, null, interval, interval);
+        }
+
+        public void Dispose()
+        {
+            if (_updateTimer != null)
+            {
+                _updateTimer.Dispose();
+                _updateTimer = null;
+            }
         }
 
         public string Name
