@@ -153,13 +153,6 @@ namespace wmc2mb
             return GetService().DeleteRecordingAsync(id, cancellationToken);
         }
 
-        public async Task<IEnumerable<ChannelItemInfo>> GetLatestMedia(ChannelLatestMediaSearch request, CancellationToken cancellationToken)
-        {
-            var result = await GetChannelItems(new InternalChannelItemQuery(), i => true, cancellationToken).ConfigureAwait(false);
-
-            return result.Items.OrderByDescending(i => i.DateCreated ?? DateTimeOffset.MinValue);
-        }
-
         public Task<ChannelItemResult> GetChannelItems(InternalChannelItemQuery query, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(query.FolderId))
